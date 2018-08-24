@@ -13,6 +13,13 @@ cd ../..
 
 python dataset_tool.py create_mnist datasets/mnist downloads/mnist
 
+# cd scripts
+# python dataset_isic2018.py
+# cd ..
+# mkdir -p datasets/isic2018_NV
+# mkdir -p downloads/isic2018_mod/NV
+# python dataset_tool.py create_from_images datasets/isic2018_NV downloads/isic2018_mod/NV
+
 # export CUDA_VISIBLE_DEVICES=
 # python train.py
 
