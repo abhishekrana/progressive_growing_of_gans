@@ -21,6 +21,8 @@ import tfutil
 import train
 import dataset
 
+import pudb
+
 #----------------------------------------------------------------------------
 # Generate random images or image grids using a previously trained network.
 # To run, uncomment the appropriate line in config.py and launch train.py.
@@ -58,10 +60,15 @@ def generate_interpolation_video(run_id, snapshot=None, grid_size=[1,1], image_s
     G, D, Gs = misc.load_network_pkl(run_id, snapshot)
 
     print('Generating latent vectors...')
+    ## shape=[1800, 1, 512]; grid_size=[1, 1]; Gs.input_shape=[None, 512]
     shape = [num_frames, np.prod(grid_size)] + Gs.input_shape[1:] # [frame, image, channel, component]
     all_latents = random_state.randn(*shape).astype(np.float32)
     all_latents = scipy.ndimage.gaussian_filter(all_latents, [smoothing_sec * mp4_fps] + [0] * len(Gs.input_shape), mode='wrap')
     all_latents /= np.sqrt(np.mean(np.square(all_latents)))
+
+    # for frame in range(num_frames):
+    #     all_latents[frame][0][0:500]=0.5
+    #     all_latents[frame][0][501:512]=0.5
 
     # Frame generation func for moviepy.
     def make_frame(t):
@@ -80,7 +87,23 @@ def generate_interpolation_video(run_id, snapshot=None, grid_size=[1,1], image_s
     import moviepy.editor # pip install moviepy
     result_subdir = misc.create_result_subdir(config.result_dir, config.desc)
     moviepy.editor.VideoClip(make_frame, duration=duration_sec).write_videofile(os.path.join(result_subdir, mp4), fps=mp4_fps, codec='libx264', bitrate=mp4_bitrate)
+
+    # aSk
+    # np.set_printoptions(threshold=np.inf)
+    # with open(os.path.join(result_subdir, 'all_latents_mod.txt'), 'w') as fp:
+    #     fp.write(str(all_latents))
+
+    latent_dims=512         # TODO: Hardcoded
+    with open(os.path.join(result_subdir, 'all_latents_mod.txt'), 'w') as fp:
+        for frame in range(num_frames):
+            for latent_dim in range(latent_dims):
+                fp.write(str(all_latents[frame][0][latent_dim]) + ', ')
+            fp.write('\n')
+    # _aSk
+
     open(os.path.join(result_subdir, '_done.txt'), 'wt').close()
+
+
 
 #----------------------------------------------------------------------------
 # Generate MP4 video of training progress for a previous training run.
