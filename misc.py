@@ -129,8 +129,8 @@ def init_output_logging():
     if output_logger is None:
         output_logger = OutputLogger()
         # _aSk
-        # sys.stdout = TeeOutputStream([sys.stdout, output_logger], autoflush=True)
-        # sys.stderr = TeeOutputStream([sys.stderr, output_logger], autoflush=True)
+        sys.stdout = TeeOutputStream([sys.stdout, output_logger], autoflush=True)
+        sys.stderr = TeeOutputStream([sys.stderr, output_logger], autoflush=True)
 
 def set_output_log_file(filename, mode='wt'):
     if output_logger is not None:

@@ -50,9 +50,13 @@ def generate_fake_images(run_id, snapshot=None, grid_size=[1,1], num_pngs=1, ima
 # To run, uncomment the appropriate line in config.py and launch train.py.
 
 def generate_interpolation_video(run_id, snapshot=None, grid_size=[1,1], image_shrink=1, image_zoom=1, duration_sec=60.0, smoothing_sec=1.0, mp4=None, mp4_fps=30, mp4_codec='libx265', mp4_bitrate='16M', random_seed=1000, minibatch_size=8):
+
+    interpolate_dim=500
+
     network_pkl = misc.locate_network_pkl(run_id, snapshot)
     if mp4 is None:
-        mp4 = misc.get_id_string_for_network_pkl(network_pkl) + '-lerp.mp4'
+        # mp4 = misc.get_id_string_for_network_pkl(network_pkl) + '-lerp.mp4'
+        mp4 = misc.get_id_string_for_network_pkl(network_pkl) + '-lerp' + '-interpolate-dim-' + str(interpolate_dim) + '.mp4'
     num_frames = int(np.rint(duration_sec * mp4_fps))
     random_state = np.random.RandomState(random_seed)
 
@@ -66,9 +70,10 @@ def generate_interpolation_video(run_id, snapshot=None, grid_size=[1,1], image_s
     all_latents = scipy.ndimage.gaussian_filter(all_latents, [smoothing_sec * mp4_fps] + [0] * len(Gs.input_shape), mode='wrap')
     all_latents /= np.sqrt(np.mean(np.square(all_latents)))
 
-    # for frame in range(num_frames):
-    #     all_latents[frame][0][0:500]=0.5
-    #     all_latents[frame][0][501:512]=0.5
+    latent_dims=512         # TODO: Hardcoded
+    for frame in range(num_frames):
+        all_latents[frame][0][0:interpolate_dim]=-0.5
+        all_latents[frame][0][interpolate_dim+1:latent_dims]=-0.5
 
     # Frame generation func for moviepy.
     def make_frame(t):
@@ -85,7 +90,8 @@ def generate_interpolation_video(run_id, snapshot=None, grid_size=[1,1], image_s
 
     # Generate video.
     import moviepy.editor # pip install moviepy
-    result_subdir = misc.create_result_subdir(config.result_dir, config.desc)
+    # result_subdir = misc.create_result_subdir(config.result_dir, config.desc)
+    result_subdir = misc.create_result_subdir(config.result_dir, config.desc + '-interpolate-dim-' + str(interpolate_dim))
     moviepy.editor.VideoClip(make_frame, duration=duration_sec).write_videofile(os.path.join(result_subdir, mp4), fps=mp4_fps, codec='libx264', bitrate=mp4_bitrate)
 
     # aSk
@@ -93,8 +99,7 @@ def generate_interpolation_video(run_id, snapshot=None, grid_size=[1,1], image_s
     # with open(os.path.join(result_subdir, 'all_latents_mod.txt'), 'w') as fp:
     #     fp.write(str(all_latents))
 
-    latent_dims=512         # TODO: Hardcoded
-    with open(os.path.join(result_subdir, 'all_latents_mod.txt'), 'w') as fp:
+    with open(os.path.join(result_subdir, 'latents_interpolate_dim_' + str(interpolate_dim) + '.txt'), 'w') as fp:
         for frame in range(num_frames):
             for latent_dim in range(latent_dims):
                 fp.write(str(all_latents[frame][0][latent_dim]) + ', ')
