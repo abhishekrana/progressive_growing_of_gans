@@ -88,7 +88,7 @@ grid        = EasyDict(size='1080p', layout='random')       # Options for train.
 #desc += '-lsun-tower';          dataset = EasyDict(tfrecord_dir='lsun-tower-100k');          train.mirror_augment = True
 #desc += '-lsun-train';          dataset = EasyDict(tfrecord_dir='lsun-train-100k');          train.mirror_augment = True
 #desc += '-lsun-tvmonitor';      dataset = EasyDict(tfrecord_dir='lsun-tvmonitor-100k');      train.mirror_augment = True
-desc += '-isic2018_NV';         dataset = EasyDict(tfrecord_dir='isic2018_NV')
+desc += '-isic2018_BKL_MEL_NV';         dataset = EasyDict(tfrecord_dir='isic2018_BKL_MEL_NV') # Training on BKL, MEL and NV
 
 # Conditioning & snapshot options.
 #desc += '-cond'; dataset.max_label_size = 'full' # conditioned on full label
@@ -104,8 +104,8 @@ desc += '-preset-v2-1gpu'; num_gpus = 1; sched.minibatch_base = 4; sched.minibat
 #desc += '-preset-v2-8gpus'; num_gpus = 8; sched.minibatch_base = 32; sched.minibatch_dict = {4: 512, 8: 256, 16: 128, 32: 64, 64: 32}; sched.G_lrate_dict = {128: 0.0015, 256: 0.002, 512: 0.003, 1024: 0.003}; sched.D_lrate_dict = EasyDict(sched.G_lrate_dict); train.total_kimg = 12000
 
 # Numerical precision (choose one).
-#desc += '-fp32'; sched.max_minibatch_per_gpu = {256: 16, 512: 8, 1024: 4}
-desc += '-fp16'; G.dtype = 'float16'; D.dtype = 'float16'; G.pixelnorm_epsilon=1e-4; G_opt.use_loss_scaling = True; D_opt.use_loss_scaling = True; sched.max_minibatch_per_gpu = {512: 16, 1024: 8}
+desc += '-fp32'; sched.max_minibatch_per_gpu = {256: 16, 512: 8, 1024: 4}
+#desc += '-fp16'; G.dtype = 'float16'; D.dtype = 'float16'; G.pixelnorm_epsilon=1e-4; G_opt.use_loss_scaling = True; D_opt.use_loss_scaling = True; sched.max_minibatch_per_gpu = {512: 16, 1024: 8}
 
 # Disable individual features.
 #desc += '-nogrowing'; sched.lod_initial_resolution = 1024; sched.lod_training_kimg = 0; sched.lod_transition_kimg = 0; train.total_kimg = 10000
@@ -134,7 +134,7 @@ desc += '-fp16'; G.dtype = 'float16'; D.dtype = 'float16'; G.pixelnorm_epsilon=1
 #train = EasyDict(func='util_scripts.generate_training_video', run_id=23, duration_sec=20.0); num_gpus = 1; desc = 'training-video-' + str(train.run_id)
 
 # aSk
-train = EasyDict(func='util_scripts.generate_interpolation_video', run_id='002-pgan-isic2018_NV-preset-v2-1gpu-fp16', grid_size=[1,1], duration_sec=60.0, smoothing_sec=1.0); num_gpus = 1; desc = 'interpolation-video-' + str(train.run_id)
+# train = EasyDict(func='util_scripts.generate_interpolation_video', run_id='002-pgan-isic2018_NV-preset-v2-1gpu-fp16', grid_size=[1,1], duration_sec=60.0, smoothing_sec=1.0); num_gpus = 1; desc = 'interpolation-video-' + str(train.run_id)
 #train = EasyDict(func='util_scripts.generate_training_video', run_id='002-pgan-isic2018_NV-preset-v2-1gpu-fp16', duration_sec=20.0); num_gpus = 1; desc = 'training-video-' + str(train.run_id)
 # _aSk
 
