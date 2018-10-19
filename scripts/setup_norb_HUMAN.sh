@@ -3,7 +3,7 @@
 cd ..
 rm -rf downloads/norb_HUMAN
 mkdir -p downloads/norb_HUMAN
-cp -r /media/data/abhishek/DATASET_PROCESSED/NORB_RES/train/AIRPLANE/* downloads/norb_HUMAN
+cp -r /media/data/abhishek/DATASET_PROCESSED/NORB_RES/train/HUMAN/* downloads/norb_HUMAN
 
 rm -rf datasets/norb_HUMAN
 mkdir -p datasets/norb_HUMAN
